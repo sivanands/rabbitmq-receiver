@@ -46,7 +46,9 @@ val receiverStream
   = RabbitMQUtils.createStreamFromRoutingKeys(sparkStreamingContext, 
                                               rabbitMQHost, 
                                               rabbitMQPort, 
-                                              exchangeName, 
+                                              exchangeName,
+                                              exchangeType,
+                                              durable,
                                               Seq("routingKey1", "routingKey2", ...), 
                                               storageLevel)
 ```
@@ -70,7 +72,9 @@ JavaReceiverInputDStream receiverStream
   = RabbitMQUtils.createJavaStreamFromRoutingKeys(javaSparkStreamingContext, 
                                               rabbitMQHost, 
                                               rabbitMQPort, 
-                                              exchangeName, 
+                                              exchangeName,
+                                              exchangeType,
+                                              durable, 
                                               routingKeyList, 
                                               storageLevel)
 ```

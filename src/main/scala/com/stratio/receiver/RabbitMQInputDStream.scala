@@ -34,6 +34,8 @@ class RabbitMQInputDStream(
                             rabbitMQHost: String,
                             rabbitMQPort: Int,
                             exchangeName: Option[String],
+                            exchangeType: Option[String],
+                            durable: Boolean,
                             routingKeys: Seq[String],
                             storageLevel: StorageLevel
                             ) extends ReceiverInputDStream[String](ssc_) with Logging {
@@ -45,6 +47,8 @@ class RabbitMQInputDStream(
       Some(rabbitMQHost).getOrElse("localhost"),
       Some(rabbitMQPort).getOrElse(DefaultRabbitMQPort),
       exchangeName,
+      exchangeType,
+      durable,
       routingKeys,
       storageLevel)
   }
@@ -55,11 +59,11 @@ class RabbitMQReceiver(rabbitMQQueueName: Option[String],
                        rabbitMQHost: String,
                        rabbitMQPort: Int,
                        exchangeName: Option[String],
+                       exchangeType: Option[String],
+                       durable: Boolean,
                        routingKeys: Seq[String],
                        storageLevel: StorageLevel)
   extends Receiver[String](storageLevel) with Logging {
-
-  val DirectExchangeType: String = "direct"
 
   def onStart() {
     implicit val akkaSystem = akka.actor.ActorSystem()
@@ -79,7 +83,7 @@ class RabbitMQReceiver(rabbitMQQueueName: Option[String],
 
     val queueName = !routingKeys.isEmpty match {
       case true => {
-        channel.exchangeDeclare(exchangeName.get, DirectExchangeType)
+        channel.exchangeDeclare(exchangeName.get, exchangeType.get, durable)
         val queueName = channel.queueDeclare().getQueue()
 
         for (routingKey: String <- routingKeys) {

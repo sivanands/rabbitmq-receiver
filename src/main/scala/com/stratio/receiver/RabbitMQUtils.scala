@@ -45,6 +45,8 @@ object RabbitMQUtils {
       rabbitMQHost,
       rabbitMQPort,
       None,
+      None,
+      false,
       Seq(),
       storageLevel)
   }
@@ -80,6 +82,8 @@ object RabbitMQUtils {
                    rabbitMQHost: String,
                    rabbitMQPort: Int,
                    exchangeName: String,
+                   exchangeType: String = "direct",
+                   durable: Boolean = false,
                    routingKeys: Seq[String],
                    storageLevel: StorageLevel = StorageLevel.MEMORY_AND_DISK_SER_2
                     ): ReceiverInputDStream[String] = {
@@ -89,6 +93,8 @@ object RabbitMQUtils {
       rabbitMQHost,
       rabbitMQPort,
       Some(exchangeName),
+      Some(exchangeType),
+      durable,
       routingKeys,
       storageLevel)
   }
@@ -106,11 +112,13 @@ object RabbitMQUtils {
                                   rabbitMQHost: String,
                                   rabbitMQPort: Int,
                                   exchangeName: String,
+                                  exchangeType: String,
+                                  durable: Boolean,
                                   routingKeys: java.util.List[String],
                                   storageLevel: StorageLevel = StorageLevel.MEMORY_AND_DISK_SER_2
                                    ): JavaReceiverInputDStream[String] = {
     implicitly[ClassTag[AnyRef]].asInstanceOf[ClassTag[String]]
-    createStreamFromRoutingKeys(jssc.ssc, rabbitMQHost, rabbitMQPort, exchangeName, scala.collection.JavaConversions
+    createStreamFromRoutingKeys(jssc.ssc, rabbitMQHost, rabbitMQPort, exchangeName, exchangeType, durable, scala.collection.JavaConversions
       .asScalaBuffer(routingKeys), storageLevel)
   }
 }
